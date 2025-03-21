@@ -1,27 +1,4 @@
-<?php
-include '../db.php'; // Include database connection
-
-// Check if user is logged in
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-
-    // Fetch the employee's name from the database
-    $query = "SELECT name FROM employees WHERE user_id = $user_id LIMIT 1";
-    $result = mysqli_query($conn, $query);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        $employee_name = $row['name']; // Store name
-    } else {
-        $employee_name = "Unknown User"; // Default if not found
-    }
-} else {
-    $employee_name = "Guest"; // If session not set
-}
-?>
-
-<?include ('header.php') ?>
-<!-- Navbar -->
+ <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -31,33 +8,19 @@ if (isset($_SESSION['user_id'])) {
         <li class="nav-item d-none d-sm-inline-block">
             <a href="../index.php" class="nav-link">Home</a>
         </li>
-        
     </ul>
 
     <!-- SEARCH FORM -->
-    <!-- <form class="form-inline ml-3 position-relative" method="GET" action="">
-        <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" name="query" id="searchBox"
-                placeholder="Search Employee..." aria-label="Search"
-                value="<?php echo isset($_GET['query']) ? htmlspecialchars($_GET['query']) : ''; ?>">
+    <!-- <form class="form-inline mx-auto" method="GET" action="search_results.php">
+        <div class="input-group">
+            <input class="form-control border-right-0" type="search" name="query" placeholder="Search..." aria-label="Search">
             <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
+                <button class="btn btn-outline-secondary" type="submit">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
-        </div> -->
-
-        <!-- Search Results Dropdown (Hidden by Default) -->
-        <div id="searchResults" class="list-group position-absolute bg-white shadow-sm rounded w-100" style="top: 38px; display: none; z-index: 1050;">
-            <?php if (!empty($search_results)): ?>
-                <?php foreach ($search_results as $result): ?>
-                    <a href="employee_profile.php?id=<?php echo $result['id']; ?>" class="list-group-item list-group-item-action">
-                        <?php echo htmlspecialchars($result['name']) . " (" . htmlspecialchars($result['designation']) . ")"; ?>
-                    </a>
-                <?php endforeach; ?>
-            <?php endif; ?>
         </div>
-    </form>
+    </form> -->
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
@@ -67,14 +30,10 @@ if (isset($_SESSION['user_id'])) {
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <span class="dropdown-item-text font-weight-bold">
-                    <?= $employee_name; ?> <!-- Display Logged-in Employee Name -->
+                    Admin <!-- Display Logged-in Employee Name -->
                 </span>
                 <div class="dropdown-divider"></div>
-                <a href="profile.php" class="dropdown-item">
-                    <i class="fas fa-user"></i> Profile
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="logout.php" class="dropdown-item text-danger">
+                <a href="../index.php" class="dropdown-item text-danger">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
@@ -83,38 +42,15 @@ if (isset($_SESSION['user_id'])) {
 </nav>
 <!-- /.navbar -->
 
-<!-- JavaScript for Search Dropdown -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchBox = document.getElementById("searchBox");
-        const searchResults = document.getElementById("searchResults");
-
-        searchBox.addEventListener("input", function () {
-            if (this.value.length > 1) {
-                searchResults.style.display = "block"; // Show results
-            } else {
-                searchResults.style.display = "none"; // Hide results
-            }
-        });
-
-        document.addEventListener("click", function (e) {
-            if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = "none"; // Hide results when clicking outside
-            }
-        });
-    });
-</script>
-
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-        <a href="#" class="brand-link">
-            <span class="brand-text font-weight-light">
-                <i class="nav-icon fas fa-user"></i> <?php echo $employee_name; ?>
-            </span>
-        </a>
-
+    <a href="index3.html" class="brand-link">
+      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+           style="opacity: .8">
+      <span class="brand-text font-weight-light">Admin</span>
+    </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -132,27 +68,49 @@ if (isset($_SESSION['user_id'])) {
             </a>
           </li>
           <li class="nav-item has-treeview">
-            <a href="./my_profile.php" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>
-              <p>Profile </p>
+              <p>Employees<i class="fas fa-angle-left right"></i> </p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="./add_employee.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Create new employee</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="./all_employees.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>View All employees</p>
+                </a>
+              </li>
+        </ul>
           </li>
           <li class="nav-item has-treeview">
-            <a href="./my_courses.php" class="nav-link">
-              <i class="nav-icon fas fa-file"></i>
-              <p>My Courses </p>
-            </a>
-          </li>
-          <li class="nav-item has-treeview">
-            <a href="./new_course.php" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-book-open"></i>
-              <p>New Courses </p>
+              <p>Courses<i class="fas fa-angle-left right"></i> </p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="./create_course.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Create new course</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="./view_courses.php" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>View All Courses</p>
+                </a>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item has-treeview">
-            <a href="./my_tni.php" class="nav-link">
+          <li class="nav-item has-treeview menu-open">
+            <a href="tni.php" class="nav-link ">
               <i class="nav-icon fas fa-clipboard"></i>
-              <p>My TNI </p>
+              <p>TNI </p>
             </a>
           </li>
           <li class="nav-item has-treeview menu-open">

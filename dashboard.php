@@ -1,89 +1,144 @@
 <?php
 session_start();
-include('../db.php');
+include('../db.php'); // Ensure this file connects to your database
 
-// Ensure employee is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'employee') {
-    header('Location: ../login.php');
-    exit();
-}
-
-// Fetch employee details using employee_id
-$employee_id = $_SESSION['employee_id'];
-$emp_query = "SELECT name, email, designation, division FROM employees WHERE id = '$employee_id'";
-$emp_result = mysqli_query($conn, $emp_query);
-$employee = mysqli_fetch_assoc($emp_result);
-
-// Fetching employee-specific statistics
-$totalApplied = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications WHERE employee_id = '$employee_id'"))['total'];
-$totalCompleted = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications WHERE employee_id = '$employee_id' AND status = 'completed'"))['total'];
-
-// Check for new notifications
-$notification_query = "SELECT COUNT(*) AS new_apps FROM applications WHERE employee_id = '$employee_id' AND status = 'pending'";
-$notification_result = mysqli_fetch_assoc(mysqli_query($conn, $notification_query));
-$new_notifications = $notification_result['new_apps'];
+// Fetching statistics for admin dashboard
+$totalEmployees = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'employee'"))['total'];
+$totalCourses = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM courses"))['total'];
+$totalApplied = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications"))['total'];
+$totalApproved = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications WHERE status = 'approved'"))['total'];
+$totalPending = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications WHERE status = 'pending'"))['total'];
+$totalCompleted = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM applications WHERE status = 'completed'"))['total'];
 ?>
 
-<?php include('header.php'); ?>
-<?php include('sidebar.php'); ?>
 
-<div class="content-header">
-    <div class="container-fluid">
+
+<?php include('header.php') ?>
+<?php include('sidebar.php') ?>
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark">Welcome, <?php echo htmlspecialchars($employee['name']); ?>!</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Employee</a></li>
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
-            </div>
-        </div>
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Dashboard </h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Admin</a></li>
+              <li class="breadcrumb-item active">Dashboard </li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
     </div>
-</div>
+    <!-- /.content-header -->
 
-<section class="content">
-    <div class="container-fluid">
+    
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Info boxes -->
         <div class="row">
-            <div class="col-12 col-sm-6 col-md-6">
-                <div class="info-box">
-                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-book"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Courses Applied</span>
-                        <span class="info-box-number"><?php echo $totalApplied; ?></span>
-                    </div>
-                </div>
+          <div class="col-12 col-sm-6 col-md-4">
+            <div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Employees</span>
+                <span class="info-box-number"><?php echo $totalEmployees; ?></span>
+              </div>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-4">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-graduation-cap"></i></span>
 
-            <div class="col-12 col-sm-6 col-md-6">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-check-circle"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Courses Completed</span>
-                        <span class="info-box-number"><?php echo $totalCompleted; ?></span>
-                    </div>
-                </div>
+              <div class="info-box-content">
+                <span class="info-box-text">Courses</span>
+                <span class="info-box-number"><?php echo $totalCourses; ?></span>
+              </div>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <!-- fix for small devices only -->
+          <div class="clearfix hidden-md-up"></div>
+
+          <div class="col-12 col-sm-6 col-md-4">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-book-open"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Total Applied</span>
+                <span class="info-box-number"><?php echo $totalApplied ?></span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+         
+          <!-- /.col -->
         </div>
-
+        <!-- /.row -->
         <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Details</h4>
-                        <p><strong>Designation:</strong> <?php echo htmlspecialchars($employee['designation']); ?></p>
-                        <p><strong>Division:</strong> <?php echo htmlspecialchars($employee['division']); ?></p>
-                        <p><strong>Email:</strong> <?php echo htmlspecialchars($employee['email']); ?></p>
+          <div class="col-12 col-sm-6 col-md-4">
+            <div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-envelope"></i></span>
 
-                        <?php if ($new_notifications > 0): ?>
-                            <p><strong>New Course Applications:</strong> <span class="badge bg-danger">Pending (<?php echo $new_notifications; ?>)</span></p>
-                        <?php endif; ?>
-                    </div>
-                </div>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Approved</span>
+                <span class="info-box-number"><?php echo $totalApproved; ?></span>
+              </div>
+              <!-- /.info-box-content -->
             </div>
-        </div>
-    </div>
-</section>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-4">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-question"></i></span>
 
-<?php include('footer.php'); ?>
+              <div class="info-box-content">
+                <span class="info-box-text">Total pending</span>
+                <span class="info-box-number"><?php echo $totalPending; ?></span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <!-- fix for small devices only -->
+          <div class="clearfix hidden-md-up"></div>
+
+          <div class="col-12 col-sm-6 col-md-4">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-thumbs-up"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Total Completed</span>
+                <span class="info-box-number"><?php echo $totalCompleted ?></span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+        
+        <!-- /.row -->
+      </div><!--/. container-fluid -->
+    </section>
+    <!-- /.content -->
+
+<?php include('footer.php') ?>
